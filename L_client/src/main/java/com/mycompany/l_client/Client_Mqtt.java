@@ -39,16 +39,21 @@ public class Client_Mqtt implements MqttCallback {
 
     private Client_Mqtt() {
         super();
-        try {
-            // inizializza il client
+        
+        /* inizializza il client */
+        try {        
             sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
         } catch (MqttException ex) {
             Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void initializeConnection() {        
+    private void initializeConnection() {
         try {
+            /* inizializza il client */
+            if (sampleClient == null) {
+                sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
+            }
 
             MqttConnectOptions connectOptions = new MqttConnectOptions();
             connectOptions.setCleanSession(true);
@@ -61,8 +66,10 @@ public class Client_Mqtt implements MqttCallback {
             sampleClient.setCallback(this);
 
             System.out.println("Connected to broker");
-        } catch (MqttException ex) {
-            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Client is connected");            
+            
+        } catch (Exception e) {
+            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -71,6 +78,7 @@ public class Client_Mqtt implements MqttCallback {
 
         try {
             initializeConnection();
+            
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
             sampleClient.publish(topic, message);
@@ -84,9 +92,7 @@ public class Client_Mqtt implements MqttCallback {
         try {
             MqttMessage messageMM = new MqttMessage(message.getBytes());
             messageMM.setQos(qos);
-            if (sampleClient.isConnected()) {
-                System.out.println("Client is connected");
-            } else {
+            if (sampleClient == null || !sampleClient.isConnected()) {
                 initializeConnection();
             }
             sampleClient.publish(topic, messageMM);
