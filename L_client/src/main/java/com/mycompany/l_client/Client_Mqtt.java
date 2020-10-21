@@ -60,6 +60,7 @@ public class Client_Mqtt implements MqttCallback {
             sampleClient.setCallback(this);
 
             System.out.println("Connected to broker");
+            System.out.println("Publishing message: " + content);
 //            System.out.println("paho-client publishing message: " + content);
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
@@ -106,7 +107,7 @@ public class Client_Mqtt implements MqttCallback {
                 connOpts.setCleanSession(true);
                 System.out.println("paho-client connecting to broker: " + broker);
                 sampleClient.connect(connOpts);
-                System.out.println("NOT CONNESSO");
+                System.out.println("Client is connected");
 
             }
             
@@ -124,7 +125,7 @@ public class Client_Mqtt implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage mm) throws Exception {
         System.out.println("Topic " + topic);
-        System.out.println("" + mm.getPayload());
+        System.out.println("MESSAGE" + new String(mm.getPayload()));
     }
 
     @Override
