@@ -37,11 +37,11 @@ public class Client_Mqtt implements MqttCallback {
         return instance;
     }
 
+    /* inizializza il client */
     private Client_Mqtt() {
         super();
-        
-        /* inizializza il client */
-        try {        
+
+        try {
             sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
         } catch (MqttException ex) {
             Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,7 +52,7 @@ public class Client_Mqtt implements MqttCallback {
         try {
             /* inizializza il client */
             if (sampleClient == null) {
-                sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
+                new Client_Mqtt();
             }
 
             MqttConnectOptions connectOptions = new MqttConnectOptions();
@@ -61,13 +61,14 @@ public class Client_Mqtt implements MqttCallback {
             /* Conneting to Broker */
             System.out.println("Conneting to Broker" + broker);
             sampleClient.connect(connectOptions);
-
+            System.out.println("Connected to broker");
+            
+            /* subscribe section */
             sampleClient.subscribe("UserConnected");
             sampleClient.setCallback(this);
-
-            System.out.println("Connected to broker");
-            System.out.println("Client is connected");            
             
+            System.out.println("Client is connected");
+
         } catch (Exception e) {
             Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -78,7 +79,7 @@ public class Client_Mqtt implements MqttCallback {
 
         try {
             initializeConnection();
-            
+
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
             sampleClient.publish(topic, message);
