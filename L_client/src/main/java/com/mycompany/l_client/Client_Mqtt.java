@@ -39,98 +39,77 @@ public class Client_Mqtt implements MqttCallback {
 
     private Client_Mqtt() {
         super();
+        try {
+            // inizializza il client
+            sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
+        } catch (MqttException ex) {
+            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void initializeConnection() {        
+        try {
+
+            MqttConnectOptions connectOptions = new MqttConnectOptions();
+            connectOptions.setCleanSession(true);
+
+            /* Conneting to Broker */
+            System.out.println("Conneting to Broker" + broker);
+            sampleClient.connect(connectOptions);
+
+            sampleClient.subscribe("UserConnected");
+            sampleClient.setCallback(this);
+
+            System.out.println("Connected to broker");
+        } catch (MqttException ex) {
+            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void connect() {
         String topic = "news";
 
         try {
-//            xxx();
-            
-            sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
-
-            MqttConnectOptions connectOptions = new MqttConnectOptions();
-            connectOptions.setCleanSession(true);
-
-            /* Conneting to Broker */
-            System.out.println("Conneting to Broker" + broker);
-            sampleClient.connect(connectOptions);
-
-            sampleClient.subscribe("UserConnected");
-            sampleClient.setCallback(this);
-
-            System.out.println("Connected to broker");
-            System.out.println("Publishing message: " + content);
-//            System.out.println("paho-client publishing message: " + content);
+            initializeConnection();
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
             sampleClient.publish(topic, message);
             System.out.println("Message published");
-
         } catch (MqttException ex) {
             ex.printStackTrace();
         }
-
     }
 
-    private void xxx(){
-        try {
-            sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
-            MqttConnectOptions connectOptions = new MqttConnectOptions();
-            connectOptions.setCleanSession(true);
-
-            /* Conneting to Broker */
-            System.out.println("Conneting to Broker" + broker);
-            sampleClient.connect(connectOptions);
-
-            sampleClient.subscribe("UserConnected");
-            sampleClient.setCallback(this);
-
-            System.out.println("Connected to broker");
-        } catch (MqttException ex) {
-            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void publish(String topic, String message){
+    public void publish(String topic, String message) {
         try {
             MqttMessage messageMM = new MqttMessage(message.getBytes());
             messageMM.setQos(qos);
-            
-            if (sampleClient.isConnected()){
+            if (sampleClient.isConnected()) {
                 System.out.println("Client is connected");
-            }else{
-//                xxx();
-                
-                sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
-                MqttConnectOptions connOpts = new MqttConnectOptions();
-                connOpts.setCleanSession(true);
-                System.out.println("paho-client connecting to broker: " + broker);
-                sampleClient.connect(connOpts);
-                System.out.println("Client is connected");
-
+            } else {
+                initializeConnection();
             }
-            
             sampleClient.publish(topic, messageMM);
         } catch (Exception ex) {
             Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public void connectionLost(Throwable thrwbl) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage mm) throws Exception {
-        System.out.println("Topic " + topic);
-        System.out.println("MESSAGE" + new String(mm.getPayload()));
+        System.out.println("TOPIC: " + topic);
+        System.out.println("MESSAGE: " + new String(mm.getPayload()));
+
     }
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken imdt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
 }
