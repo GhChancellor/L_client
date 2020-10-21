@@ -10,7 +10,7 @@ package com.mycompany.l_client;/**
 public class Main {
     
     public static void main(String[] args) {
-//        Client_Mqtt.getInstance().connect();
+        Client_Mqtt.getInstance().connect();
         Client_Mqtt.getInstance().publish("imalive", "ciao a tutti");
     }
     
