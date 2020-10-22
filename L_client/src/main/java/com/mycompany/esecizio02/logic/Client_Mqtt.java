@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.l_client;
+package com.mycompany.esecizio02.logic;
 
 import java.util.Date;
 import java.util.logging.Level;
@@ -52,7 +52,7 @@ public class Client_Mqtt implements MqttCallback {
         try {
             /* inizializza il client */
             if (sampleClient == null) {
-                new Client_Mqtt();
+                sampleClient = new MqttClient(broker, clientId, new MemoryPersistence());
             }
 
             MqttConnectOptions connectOptions = new MqttConnectOptions();
@@ -93,9 +93,11 @@ public class Client_Mqtt implements MqttCallback {
         try {
             MqttMessage messageMM = new MqttMessage(message.getBytes());
             messageMM.setQos(qos);
+            
             if (sampleClient == null || !sampleClient.isConnected()) {
                 initializeConnection();
             }
+            
             sampleClient.publish(topic, messageMM);
         } catch (Exception ex) {
             Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);

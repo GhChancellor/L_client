@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.l_client;/**
+package com.mycompany.esecizio01;/**
  *
  * @author Luca
  */
-public class Main {
+public class MainClient01 {
     
     public static void main(String[] args) {
         Client_Mqtt.getInstance().connect();
