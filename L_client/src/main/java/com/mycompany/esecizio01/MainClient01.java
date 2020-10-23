@@ -3,7 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.esecizio01;/**
+package com.mycompany.esecizio01;
+
+import com.mycompany.esecizio01.logic.mqtt.Client_Mqtt;
+
+/**
  *
  * @author Luca
  */

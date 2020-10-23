@@ -5,16 +5,18 @@
  */
 package com.mycompany.esecizio02.gui;
 
-import com.mycompany.esecizio02.logic.Client_Mqtt;
+import com.mycompany.esecizio02.logic.mqtt.Client_Mqtt;
 import com.mycompany.esecizio02.logic.ConnectionEvent;
 import com.mycompany.esecizio02.logic.EventManager;
+import javax.swing.DefaultListModel;
 
 /**
  *
  * @author lele
  */
 public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
-
+    final DefaultListModel model = new DefaultListModel();
+    
     /**
      * Creates new form NewJDialog
      */
@@ -23,6 +25,7 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
         initComponents();
         Client_Mqtt.getInstance().connect();
         EventManager.getInstance().addConnectionEvents(this);
+        
     }
 
     /**
@@ -70,11 +73,6 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(jList1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -101,6 +99,7 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Client_Mqtt.getInstance().publish("UserConnected", this.jTextField1.getText());
+//        messagge(jTextField1.getText());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -155,6 +154,9 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
 
     @Override
     public void messagge(String message) {
-        jList1.add(message, this);
+        model.addElement(message);
+        jList1.setModel(model);
+        
+        System.out.println("aasasasas " +message);
     }
 }

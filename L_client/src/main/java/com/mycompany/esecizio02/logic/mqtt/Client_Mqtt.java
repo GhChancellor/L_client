@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.esecizio01;
+package com.mycompany.esecizio02.logic.mqtt;
 
 import java.util.Date;
 import java.util.logging.Level;
