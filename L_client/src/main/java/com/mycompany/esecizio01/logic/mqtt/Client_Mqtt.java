@@ -69,6 +69,8 @@ public class Client_Mqtt implements MqttCallback {
             
             /* subscribe section */
             sampleClient.subscribe("UserConnected");
+            sampleClient.subscribe("prova01");
+            sampleClient.subscribe("news");
             sampleClient.setCallback(this);
             
             System.out.println("Client is connected");
@@ -124,7 +126,6 @@ public class Client_Mqtt implements MqttCallback {
      */
     @Override
     public void messageArrived(String topic, MqttMessage mm) throws Exception {
-        System.out.println("Client del client");
         System.out.println("TOPIC: " + topic);
         System.out.println("MESSAGE: " + new String(mm.getPayload()) + "\n");
     }
