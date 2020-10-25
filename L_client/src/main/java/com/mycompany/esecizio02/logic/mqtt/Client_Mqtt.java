@@ -48,6 +48,9 @@ public class Client_Mqtt implements MqttCallback {
         }
     }
 
+    /**
+     * inizializza il client e accede a un canale 
+     */
     private void initializeConnection() {
         try {
             /* inizializza il client */
@@ -82,6 +85,8 @@ public class Client_Mqtt implements MqttCallback {
 
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
+            
+            /* Invia il messaggio al server */
             sampleClient.publish(topic, message);
             System.out.println("Message published");
         } catch (MqttException ex) {
@@ -109,11 +114,16 @@ public class Client_Mqtt implements MqttCallback {
 
     }
 
+    /**
+     * Riceve un messaggio dal server e lo mette a video
+     * @param topic
+     * @param mm
+     * @throws Exception 
+     */
     @Override
     public void messageArrived(String topic, MqttMessage mm) throws Exception {
         System.out.println("TOPIC: " + topic);
         System.out.println("MESSAGE: " + new String(mm.getPayload()));
-
     }
 
     @Override

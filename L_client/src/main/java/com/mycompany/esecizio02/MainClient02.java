@@ -11,7 +11,7 @@ import com.mycompany.esecizio02.logic.mqtt.Client_Mqtt;
  *
  * @author Luca
  */
-public class MainClient01 {
+public class MainClient02 {
     
     public static void main(String[] args) {
         Client_Mqtt.getInstance().connect();
