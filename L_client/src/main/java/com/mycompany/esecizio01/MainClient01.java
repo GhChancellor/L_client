@@ -15,7 +15,7 @@ public class MainClient01 {
     
     public static void main(String[] args) {
         Client_Mqtt.getInstance().connect();
-        Client_Mqtt.getInstance().publish("imalive", "ciao a tutti");
+        Client_Mqtt.getInstance().publish("Talk", "ciao a tutti");
     }
     
 }
