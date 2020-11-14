@@ -5,17 +5,23 @@
  */
 package com.mycompany.esecizio02;
 
+import com.mycompany.esecizio02.gui.NewJDialog;
 import com.mycompany.esecizio02.logic.mqtt.Client_Mqtt;
+import javax.swing.JFrame;
 
 /**
  *
  * @author Luca
  */
 public class MainClient02 {
-    
+
     public static void main(String[] args) {
-        Client_Mqtt.getInstance().connect();
-        Client_Mqtt.getInstance().publish("imalive", "ciao a tutti");
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new NewJDialog(new JFrame(), true).setVisible(true);
+                System.exit(0);
+            }
+
+        });
     }
-    
 }

@@ -9,6 +9,8 @@ package com.mycompany.esecizio02.logic;
  *
  * @author lele
  */
-public interface ConnectionEvent {
-    public void messagge(String message);
+public interface Listener {
+    public void userConnected(String message);
+    public void channel(String message);
+    public void allUsers(String allUsers);
 }

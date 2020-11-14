@@ -5,27 +5,38 @@
  */
 package com.mycompany.esecizio02.gui;
 
-import com.mycompany.esecizio02.logic.mqtt.Client_Mqtt;
-import com.mycompany.esecizio02.logic.ConnectionEvent;
-import com.mycompany.esecizio02.logic.EventManager;
+import com.mycompany.esecizio02.logic.Dispatcher;
 import javax.swing.DefaultListModel;
+import com.mycompany.esecizio02.logic.Listener;
+import com.mycompany.esecizio02.logic.mqtt.Client_Mqtt;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 /**
  *
  * @author lele
  */
-public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
+public class NewJDialog extends javax.swing.JDialog implements Listener {
+
+    private boolean talk = true;
+    String channel = "talk";
+
     final DefaultListModel model = new DefaultListModel();
-    
+
     /**
      * Creates new form NewJDialog
      */
     public NewJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        initComponents();
-        Client_Mqtt.getInstance().connect();
-        EventManager.getInstance().addConnectionEvents(this);
-        
+        try {
+            initComponents();
+            Dispatcher.getInstance().addDispatcher(this);
+            Client_Mqtt.getInstance().connect();
+            Client_Mqtt.getInstance().topicSubscribe(channel);
+        } catch (MqttException ex) {
+            Logger.getLogger(NewJDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -38,19 +49,15 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jTextFieldSendText = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jButtonSend = new javax.swing.JButton();
+        jButtonTalk = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextAreaSendText = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jButton1.setText("Button");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -58,22 +65,36 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextFieldSendText)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTextFieldSendText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jList1);
+
+        jButtonSend.setText("Send");
+        jButtonSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSendActionPerformed(evt);
+            }
+        });
+
+        jButtonTalk.setText("Talk");
+        jButtonTalk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonTalkActionPerformed(evt);
+            }
+        });
+
+        jTextAreaSendText.setColumns(20);
+        jTextAreaSendText.setRows(5);
+        jScrollPane2.setViewportView(jTextAreaSendText);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -82,7 +103,15 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonSend, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonTalk, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -90,17 +119,41 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButtonSend)
+                        .addComponent(jButtonTalk)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Client_Mqtt.getInstance().publish("UserConnected", this.jTextField1.getText());
-//        messagge(jTextField1.getText());
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jButtonTalkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTalkActionPerformed
+        try {
+
+            if (talk) {
+                talk = false;
+                jButtonTalk.setText("Mute");
+                Client_Mqtt.getInstance().topicUnsubscribe(channel);
+
+            } else {
+                Client_Mqtt.getInstance().topicSubscribe(channel);
+                jButtonTalk.setText("Talk");
+                talk = true;
+            }
+        } catch (MqttException ex) {
+            Logger.getLogger(NewJDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jButtonTalkActionPerformed
+
+    private void jButtonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendActionPerformed
+        Client_Mqtt.getInstance().publish(channel, jTextFieldSendText.getText());
+    }//GEN-LAST:event_jButtonSendActionPerformed
 
     /**
      * @param args the command line arguments
@@ -145,18 +198,30 @@ public class NewJDialog extends javax.swing.JDialog implements ConnectionEvent{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonSend;
+    private javax.swing.JButton jButtonTalk;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextAreaSendText;
+    private javax.swing.JTextField jTextFieldSendText;
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void messagge(String message) {
+    public void userConnected(String message) {
         model.addElement(message);
         jList1.setModel(model);
-        
-        System.out.println("aasasasas " +message);
+    }
+
+    @Override
+    public void channel(String message) {
+        jTextAreaSendText.setText(message);
+    }
+
+    @Override
+    public void allUsers(String allUsers) {
+        model.addElement(allUsers);
+        jList1.setModel(model);        
     }
 }
