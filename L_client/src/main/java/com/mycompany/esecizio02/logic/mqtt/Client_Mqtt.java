@@ -28,7 +28,7 @@ public class Client_Mqtt implements MqttCallback {
     private MqttClient client = null;
 
     private String broker = "tcp://0.0.0.0:1883";
-    private String clientId = "" + new Date().getTime();
+    private String clientID = "" + new Date().getTime();
     private final String userConnected = "UserConnected";
 
     public static Client_Mqtt getInstance() {
@@ -41,51 +41,64 @@ public class Client_Mqtt implements MqttCallback {
     /* inizializza il client */
     private Client_Mqtt() {
         super();
+        initClient();
+    }
 
+    /* inizializza il client */
+    private void initClient() {
+        
         try {
-            client = new MqttClient(broker, clientId, new MemoryPersistence());
+            client = new MqttClient(broker, clientID, new MemoryPersistence());
         } catch (MqttException ex) {
             Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }    
+    
+    public void connect() throws MqttException {
+        checkConnection();
     }
 
-    public void connect() {
-        initializeConnection();
+    /**
+     * Check Connection
+     *
+     * @throws MqttException
+     */
+    private void checkConnection() throws MqttException {
+        if (client == null || client.isConnected()) {
+            initClient();
+            initializeConnection();
+        }
     }
 
     /**
      * inizializza il client e accede a un canale
      */
-    private void initializeConnection() {
-        try {
-            if (client == null) {
-                client = new MqttClient(broker, clientId, new MemoryPersistence());
-            }
+    private void initializeConnection() throws MqttException {
+        initClient();
 
-            MqttConnectOptions connectOptions = new MqttConnectOptions();
-            connectOptions.setCleanSession(true);
+        MqttConnectOptions connectOptions = new MqttConnectOptions();
+        connectOptions.setCleanSession(true);
 
-            /* Conneting to Broker */
-            client.connect(connectOptions);
+        /* Conneting to Broker */
+        client.connect(connectOptions);
 
-            /* Public message */
-            publish("UserConnected", "Client " + clientId + " is connected. " + "\n");
-       
-            /* subscribe section */
-            client.subscribe(userConnected);     
-            client.subscribe("allusers");
-            client.setCallback(this);
-            
-        } catch (Exception ex) {
-            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        /* Public message */
+        publish("UserConnected", "Client " + clientID + " is connected. " + "\n");
+
+        /* subscribe section */
+        client.subscribe(userConnected);
+        client.subscribe("allusers");
+        client.setCallback(this);
+
     }
 
     public void topicSubscribe(String topic) throws MqttException {
+        checkConnection();
         client.subscribe(topic);
     }
 
     public void topicUnsubscribe(String topic) throws MqttException {
+        checkConnection();
         client.unsubscribe(topic);
     }
 
@@ -95,19 +108,13 @@ public class Client_Mqtt implements MqttCallback {
      * @param topic
      * @param message
      */
-    public void publish(String topic, String message) {
-        try {
-            MqttMessage mqttMessage = new MqttMessage(message.getBytes());
-            mqttMessage.setQos(qos);
+    public void publish(String topic, String message) throws MqttException {
+        MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+        mqttMessage.setQos(qos);
+        
+        checkConnection();
+        client.publish(topic, mqttMessage);
 
-            if (client == null || client.isConnected()) {
-                initializeConnection();
-            }
-
-            client.publish(topic, mqttMessage);
-        } catch (MqttException ex) {
-            Logger.getLogger(Client_Mqtt.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @Override
@@ -136,15 +143,13 @@ String part1 = parts[0]; // 004
 String part2 = parts[1]; // 034556
          */
         if (topic.equals("allusers")) {
-            String[] allusers = new String( mm.getPayload()).split("-");
+            String[] allusers = new String(mm.getPayload()).split("-");
             for (String alluser : allusers) {
                 allUsers(alluser);
-                System.out.println("All users"+ alluser);
+                System.out.println("All users" + alluser);
             }
-            
 
 //            client.unsubscribe("allusers");
-
         }
 
         if (topic.equals("talk")) {
@@ -160,10 +165,10 @@ String part2 = parts[1]; // 034556
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private void allUsers(String alluser){
+    private void allUsers(String alluser) {
         Dispatcher.getInstance().update(alluser);
     }
-    
+
     private void connected(MqttMessage mm) {
         Dispatcher.getInstance().update(new String(mm.getPayload()));
     }
